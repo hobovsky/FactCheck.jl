@@ -349,7 +349,7 @@ function make_handler(suite::TestSuite)
     function delayed_handler(r::Error)
         print(r)
     end
-    function delayed_handler(p::Pending)
+    function delayed_handler(r::Pending)
         print(r)
     end
     delayed_handler
