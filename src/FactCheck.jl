@@ -25,7 +25,7 @@ export @fact, @fact_throws, @pending,
 # such as its file, line number, description, etc.
 abstract type Result end
 
-type ResultMetadata
+mutable struct ResultMetadata
     line
     msg
     function ResultMetadata(;line=nothing, msg=nothing)
@@ -33,7 +33,7 @@ type ResultMetadata
     end
 end
 
-type Success <: Result
+mutable struct Success <: Result
     expr::Expr
     fact_type::Symbol
     lhs  # What it was
@@ -41,7 +41,7 @@ type Success <: Result
     meta::ResultMetadata
 end
 
-type Failure <: Result
+mutable struct Failure <: Result
     expr::Expr
     fact_type::Symbol
     lhs  # What it was
@@ -49,7 +49,7 @@ type Failure <: Result
     meta::ResultMetadata
 end
 
-type Error <: Result
+mutable struct Error <: Result
     expr::Expr
     fact_type::Symbol
     err::Exception
@@ -57,8 +57,7 @@ type Error <: Result
     meta::ResultMetadata
 end
 
-type Pending <: Result
-end
+struct Pending <: Result end
 
 # Collection of all results across facts
 allresults = Result[]
@@ -132,7 +131,7 @@ function Base.show(io::IO, s::Success)
     end
 end
 
-function Base.show(io::IO, p::Pending)
+function Base.show(io::IO, ::Pending)
     println(io, "\n<LOG::>Pending")
 end
 
@@ -193,6 +192,7 @@ macro fact(factex::Expr, args...)
     if factex.head != :(-->) && factex.head != :(=>)
         error("Incorrect usage of @fact: $factex")
     end
+    # TODO: remove deprecated syntax
     if factex.head == :(=>)
         Base.warn_once("The `=>` syntax is deprecated, use `-->` instead")
     end
@@ -317,7 +317,7 @@ end
 
 # A TestSuite collects the results of a series of tests, as well as
 # some information about the tests such as their file and description.
-type TestSuite
+mutable struct TestSuite
     filename
     desc
     successes::Vector{Success}
@@ -388,7 +388,7 @@ context(f::Function) = context(f, "")
 
 @noinline getline() = StackTraces.stacktrace()[2].line
 
-replace_lf(s::AbstractString) = replace(s, "\n", "<:LF:>")
+replace_lf(s::AbstractString) = replace(s, "\n" => "<:LF:>")
 
 ############################################################
 # Assertion helpers
