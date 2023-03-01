@@ -83,13 +83,13 @@ end
 
 # Define printing functions for the result types
 function Base.show(io::IO, f::Failure)
-    println(io, "\n<IT::>", f.meta.msg != nothing ? "$(f.meta.msg)" : format_fact(f.expr))
-    println(io, "\n<FAILED::>Test Failed")
+    println(io, "\n<IT::>", replace_lf(f.meta.msg != nothing ? "$(f.meta.msg)" : format_fact(f.expr)))
+    print(io, "\n<FAILED::>Test Failed")
     if f.fact_type == :fact_throws
         # @fact_throws didn't get an error, or the right type of error
         if f.rhs != :fact_throws_noerror
-            println(io, "\tExpected: ", f.rhs[1])
-            println(io, "\tOccurred: ", f.rhs[2])
+            print(io, "<:LF:>  Expected: ", f.rhs[1])
+            print(io, "<:LF:>  Occurred: ", f.rhs[2])
         end
     elseif f.fact_type == :fact
         # @fact didn't get the right result
@@ -98,34 +98,34 @@ function Base.show(io::IO, f::Failure)
             # Fancy helper fact
             fcFunc = _factcheck_function(args[2])
             if haskey(FACTCHECK_FUN_NAMES, fcFunc)
-                println(io, replace_lf(string("\tExpected: ", sprint(show, f.lhs), " ", FACTCHECK_FUN_NAMES[fcFunc], " ", sprint(show, f.rhs))))
+                print(io, replace_lf(string("  Expected: ", sprint(show, f.lhs), " ", FACTCHECK_FUN_NAMES[fcFunc], " ", sprint(show, f.rhs))))
             else
-                println(io, replace_lf(string("\tExpected: ", sprint(show, f.lhs), " --> ", fcFunc, "(", sprint(show, f.rhs), ")")))
+                print(io, replace_lf(string("  Expected: ", sprint(show, f.lhs), " --> ", fcFunc, "(", sprint(show, f.rhs), ")")))
             end
         else
             # Normal equality-test-style fact
-            println(io, replace_lf(string("\tExpected: ", sprint(show, f.rhs), "\n", "\tOccurred: ", sprint(show, f.lhs))))
+            print(io, replace_lf(string("<:LF:>  Expected: ", sprint(show, f.rhs), "<:LF:>  Occurred: ", sprint(show, f.lhs))))
         end
     else
         error("Unknown fact type: ", f.fact_type)
     end
-    println(io, "\n<COMPLETEDIN::>")
+    println(io, "\n\n<COMPLETEDIN::>")
 end
 
 function Base.show(io::IO, e::Error)
-    println(io, "\n<IT::>", e.meta.msg != nothing ? "$(e.meta.msg)" : format_fact(e.expr))
+    println(io, "\n<IT::>", replace_lf(e.meta.msg != nothing ? "$(e.meta.msg)" : format_fact(e.expr)))
     println(io, "\n<ERROR::>Test Errored")
-    println(io, replace_lf(sprint(showerror, e.err, e.backtrace)))
+    println(io, "\n<LOG::Stack trace>", replace_lf(sprint(showerror, e.err, e.backtrace)))
     println(io, "\n<COMPLETEDIN::>")
 end
 
 function Base.show(io::IO, s::Success)
     if s.rhs == :fact_throws_error
-        println(io, "\n<IT::>", s.meta.msg != nothing ? "$(s.meta.msg)" : "Throws Error")
+        println(io, "\n<IT::>", replace_lf(s.meta.msg != nothing ? "$(s.meta.msg)" : "Throws Error"))
         println(io, "\n<PASSED::>Test Passed")
         println(io, "\n<COMPLETEDIN::>")
     else
-        println(io, "\n<IT::>", s.meta.msg != nothing ? "$(s.meta.msg)" : format_fact(s.expr))
+        println(io, "\n<IT::>", replace_lf(s.meta.msg != nothing ? "$(s.meta.msg)" : format_fact(s.expr)))
         println(io, "\n<PASSED::>Test Passed")
         println(io, "\n<COMPLETEDIN::>")
     end
@@ -360,7 +360,7 @@ end
 # environment, which means constructing a `TestSuite`, generating
 # and registering test handlers, and reporting results.
 function facts(f::Function, desc)
-    println(string("\n<DESCRIBE::>", desc == nothing ? "Unnamed Facts" : "$(desc)"))
+    println(string("\n<DESCRIBE::>", replace_lf(desc == nothing ? "Unnamed Facts" : "$(desc)")))
     handler = make_handler(TestSuite(nothing, desc))
     push!(handlers, handler)
     f()
@@ -373,7 +373,7 @@ facts(f::Function) = facts(f, nothing)
 # Executes a battery of tests in some descriptive context, intended
 # for use inside of `facts`. Displays the string in default mode.
 function context(f::Function, desc::AbstractString)
-    println(string("\n<DESCRIBE::>", desc == "" ? "Unnamed Context" : desc))
+    println(string("\n<DESCRIBE::>", replace_lf(desc == "" ? "Unnamed Context" : desc)))
     push!(contexts, desc)
     try
         f()
