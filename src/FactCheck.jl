@@ -83,8 +83,8 @@ end
 
 # Define printing functions for the result types
 function Base.show(io::IO, f::Failure)
-    println(io, "\n<IT::>", replace_lf(f.meta.msg != nothing ? "$(f.meta.msg)" : format_fact(f.expr)))
-    print(io, "\n<FAILED::>Test Failed")
+    println(io, "\n<IT::>", replace_lf(format_fact(f.expr)))
+    print(io, "\n<FAILED::>", replace_lf(f.meta.msg != nothing ? "$(f.meta.msg)" : "Test Failed"))
     if f.fact_type == :fact_throws
         # @fact_throws didn't get an error, or the right type of error
         if f.rhs != :fact_throws_noerror
@@ -98,9 +98,9 @@ function Base.show(io::IO, f::Failure)
             # Fancy helper fact
             fcFunc = _factcheck_function(args[2])
             if haskey(FACTCHECK_FUN_NAMES, fcFunc)
-                print(io, replace_lf(string("  Expected: ", sprint(show, f.lhs), " ", FACTCHECK_FUN_NAMES[fcFunc], " ", sprint(show, f.rhs))))
+                print(io, replace_lf(string("<:LF:>  Expected: ", sprint(show, f.lhs), " ", FACTCHECK_FUN_NAMES[fcFunc], " ", sprint(show, f.rhs))))
             else
-                print(io, replace_lf(string("  Expected: ", sprint(show, f.lhs), " --> ", fcFunc, "(", sprint(show, f.rhs), ")")))
+                print(io, replace_lf(string("<:LF:>  Expected: ", sprint(show, f.lhs), " --> ", fcFunc, "(", sprint(show, f.rhs), ")")))
             end
         else
             # Normal equality-test-style fact
