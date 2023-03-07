@@ -114,8 +114,8 @@ end
 
 function Base.show(io::IO, e::Error)
     println(io, "\n<IT::>", replace_lf(e.meta.msg != nothing ? "$(e.meta.msg)" : format_fact(e.expr)))
-    println(io, "\n<ERROR::>Test Errored")
-    println(io, "\n<LOG::Stack trace>", replace_lf(sprint(showerror, e.err, e.backtrace)))
+    println(io, "\n<ERROR::>", replace_lf(sprint(showerror, e.err)))
+    println(io, "\n<LOG::-Stack trace>", replace_lf(sprint(showerror, e.err, e.backtrace)))
     println(io, "\n<COMPLETEDIN::>")
 end
 
