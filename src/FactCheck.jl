@@ -120,15 +120,9 @@ function Base.show(io::IO, e::Error)
 end
 
 function Base.show(io::IO, s::Success)
-    if s.rhs == :fact_throws_error
-        println(io, "\n<IT::>", replace_lf(s.meta.msg != nothing ? "$(s.meta.msg)" : "Throws Error"))
-        println(io, "\n<PASSED::>Test Passed")
-        println(io, "\n<COMPLETEDIN::>")
-    else
-        println(io, "\n<IT::>", replace_lf(format_fact(s.expr)))
-        println(io, "\n<PASSED::>Test Passed")
-        println(io, "\n<COMPLETEDIN::>")
-    end
+	println(io, "\n<IT::>", replace_lf(format_fact(s.expr)))
+	println(io, "\n<PASSED::>Test Passed")
+	println(io, "\n<COMPLETEDIN::>")
 end
 
 function Base.show(io::IO, ::Pending)
