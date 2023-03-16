@@ -113,8 +113,9 @@ function Base.show(io::IO, f::Failure)
 end
 
 function Base.show(io::IO, e::Error)
-    println(io, "\n<IT::>", replace_lf(e.meta.msg != nothing ? "$(e.meta.msg)" : format_fact(e.expr)))
-    println(io, "\n<ERROR::>", replace_lf(sprint(showerror, e.err)))
+    println(io, "\n<IT::>", replace_lf(format_fact(e.expr)))
+    errorMsg = e.meta.msg != nothing ? sprint(print, e.meta.msg) : sprint(showerror, e.err)
+    println(io, "\n<ERROR::>", replace_lf(errorMsg))
     println(io, "\n<LOG::-Stack trace>", replace_lf(sprint(showerror, e.err, e.backtrace)))
     println(io, "\n<COMPLETEDIN::>")
 end
