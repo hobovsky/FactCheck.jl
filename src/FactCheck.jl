@@ -125,7 +125,7 @@ function Base.show(io::IO, s::Success)
         println(io, "\n<PASSED::>Test Passed")
         println(io, "\n<COMPLETEDIN::>")
     else
-        println(io, "\n<IT::>", replace_lf(s.meta.msg != nothing ? "$(s.meta.msg)" : format_fact(s.expr)))
+        println(io, "\n<IT::>", replace_lf(format_fact(s.expr)))
         println(io, "\n<PASSED::>Test Passed")
         println(io, "\n<COMPLETEDIN::>")
     end
